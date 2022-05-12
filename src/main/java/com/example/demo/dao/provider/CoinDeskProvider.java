@@ -1,6 +1,6 @@
 package com.example.demo.dao.provider;
 
-import com.example.demo.dao.entity.CurrenctPriceProviderEntity;
+import com.example.demo.dao.entity.CurrencyPriceProviderEntity;
 import com.example.demo.dto.CurrentPriceDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -25,17 +25,17 @@ public class CoinDeskProvider implements ICoinDeskProvider {
 
     RestTemplate restTemplate = new RestTemplate();
     restTemplate.getMessageConverters().add(new JavaScriptMessageConverter());
-    CurrenctPriceProviderEntity response = restTemplate.getForObject(currentPriceUrl, CurrenctPriceProviderEntity.class);
+    CurrencyPriceProviderEntity response = restTemplate.getForObject(currentPriceUrl, CurrencyPriceProviderEntity.class);
     if (response != null) {
-      CurrentPriceDto coinDeskDto = new CurrentPriceDto();
-      CurrentPriceDto.Time time = new CurrentPriceDto.Time(response.getTime().getUpdatedISO());
+      CurrentPriceDto.Time time = CurrentPriceDto.Time.builder().updated(response.getTime().getUpdatedISO()).build();
+      CurrentPriceDto coinDeskDto = CurrentPriceDto.builder().time(time).build();
 
       Map<String, CurrentPriceDto.Currency> currencyMap = new HashMap<>();
-      CurrenctPriceProviderEntity.Bpi.Currency usd = response.getBpi().getUSD();
+      CurrencyPriceProviderEntity.Bpi.Currency usd = response.getBpi().getUSD();
       currencyMap.put("USD", new CurrentPriceDto.Currency(usd.getCode(), "", usd.getRate()));
-      CurrenctPriceProviderEntity.Bpi.Currency gbp = response.getBpi().getGBP();
+      CurrencyPriceProviderEntity.Bpi.Currency gbp = response.getBpi().getGBP();
       currencyMap.put("GBP", new CurrentPriceDto.Currency(gbp.getCode(), "", gbp.getRate()));
-      CurrenctPriceProviderEntity.Bpi.Currency eur = response.getBpi().getEUR();
+      CurrencyPriceProviderEntity.Bpi.Currency eur = response.getBpi().getEUR();
       currencyMap.put("EUR", new CurrentPriceDto.Currency(eur.getCode(), "", eur.getRate()));
 
       coinDeskDto.setTime(time);
